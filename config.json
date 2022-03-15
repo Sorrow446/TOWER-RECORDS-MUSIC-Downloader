@@ -1,0 +1,8 @@
+{
+    "email": "",
+    "password": "",
+    "format": 2,
+    "outPath": "TOWER RECORDS MUSIC downloads",
+    "trackTemplate": "{{.trackPad}}. {{.title}}",
+    "lyrics": true
+}
