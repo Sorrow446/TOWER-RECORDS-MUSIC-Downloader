@@ -13,6 +13,7 @@ Configure any other options if needed.
 |format|Download quality. 1 = AAC 128, 2 = AAC 320.
 |outPath|Where to download to. Path will be made if it doesn't already exist.
 |trackTemplate|Track filename naming template. Vars: album, albumArtist, artist, title, track, trackPad, trackTotal, year.
+|lyrics|Get lyrics if available.
 
 # Usage
 Args take priority over the config file.
@@ -28,7 +29,7 @@ Download a single album and from two text files:
   | | |    -| | | |  |  |  | . | | | |   | | . | .'| . | -_|  _|
   |_| |__|__|_|_|_|  |____/|___|_____|_|_|_|___|__,|___|___|_|
 
-Usage: trm_dl_x64.exe [--format FORMAT] [--outpath OUTPATH] URLS [URLS ...]
+Usage: trm_dl_x64.exe [--format FORMAT] [--outpath OUTPATH] [--lyrics] URLS [URLS ...]
 
 Positional arguments:
   URLS
@@ -38,6 +39,7 @@ Options:
                          Download quality. 1 = AAC 128, 2 = AAC 320. [default: -1]
   --outpath OUTPATH, -o OUTPATH
                          Where to download to. Path will be made if it doesn't already exist.
+  --lyrics, -l           Get lyrics if available.
   --help, -h             display this help and exit
   ```
    
