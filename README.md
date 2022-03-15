@@ -16,7 +16,8 @@ Configure any other options if needed.
 |lyrics|Get lyrics if available.
 
 # Usage
-Args take priority over the config file.
+Args take priority over the config file.    
+**You can get a subscription with a foreign credit card.**
 
 Download two albums:   
 `trm_dl_x64.exe https://music.tower.jp/album/detail/1020615044 https://music.tower.jp/album/detail/1020661108`
