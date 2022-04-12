@@ -5,10 +5,11 @@ import "encoding/xml"
 type Transport struct{}
 
 type WriteCounter struct {
-	Total      uint64
+	Total      int64
 	TotalStr   string
-	Downloaded uint64
+	Downloaded int64
 	Percentage int
+	StartTime  int64
 }
 
 type Config struct {

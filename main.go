@@ -31,8 +31,8 @@ const (
 	urlBase     = "https://music.tower.jp/"
 	apiBase     = "https://api.music.tower.jp/api/v1/"
 	lyricsUrl   = "https://yanone.music-sc.jp/lyrics/"
-	accessToken = "ca083af8d0f35d6b7f1ab8b38d434a77"
-	userAgent   = "TRMUSIC ASUS_Z01QD(SP;2.1.0.1;Android;7.1.2;25);locale:" +
+	accessToken = "e2b5b1656d97543321f5931992eebf08"
+	userAgent   = "TRMUSIC ASUS_Z01QD(SP;9.9.9.9;Android;7.1.2;25);locale:" +
 		"ja-jp;deviceid:ad5ad4d54477fc4f0ef9162715b530c52dd91d8d007b8865bb" +
 		"6174d07c19a513;networkoperator:23430;display:Asus-user 7.1.2 2017" +
 		"1130.276299 release-keys;buildid:N2G48H"
@@ -55,11 +55,17 @@ func (t *Transport) RoundTrip(req *http.Request) (*http.Response, error) {
 }
 
 func (wc *WriteCounter) Write(p []byte) (int, error) {
+	var speed int64 = 0
 	n := len(p)
-	wc.Downloaded += uint64(n)
+	wc.Downloaded += int64(n)
 	percentage := float64(wc.Downloaded) / float64(wc.Total) * float64(100)
 	wc.Percentage = int(percentage)
-	fmt.Printf("\r%d%%, %s/%s ", wc.Percentage, humanize.Bytes(wc.Downloaded), wc.TotalStr)
+	toDivideBy := time.Now().UnixMilli() - wc.StartTime
+	if toDivideBy != 0 {
+		speed = int64(wc.Downloaded) / toDivideBy * 1000
+	}
+	fmt.Printf("\r%d%% @ %s/s, %s/%s ", wc.Percentage, humanize.Bytes(uint64(speed)),
+		humanize.Bytes(uint64(wc.Downloaded)), wc.TotalStr)
 	return n, nil
 }
 
@@ -71,13 +77,19 @@ func handleErr(errText string, err error, _panic bool) {
 	fmt.Println(errString)
 }
 
+func wasRunFromSrc() bool {
+	buildPath := filepath.Join(os.TempDir(), "go-build")
+	return strings.HasPrefix(os.Args[0], buildPath)
+}
+
 func getScriptDir() (string, error) {
 	var (
 		ok    bool
 		err   error
 		fname string
 	)
-	if filepath.IsAbs(os.Args[0]) {
+	runFromSrc := wasRunFromSrc()
+	if runFromSrc {
 		_, fname, _, ok = runtime.Caller(0)
 		if !ok {
 			return "", errors.New("Failed to get script filename.")
@@ -88,20 +100,22 @@ func getScriptDir() (string, error) {
 			return "", err
 		}
 	}
-	scriptDir := filepath.Dir(fname)
-	return scriptDir, nil
+	return filepath.Dir(fname), nil
 }
 
 func readTxtFile(path string) ([]string, error) {
 	var lines []string
-	f, err := os.Open(path)
+	f, err := os.OpenFile(path, os.O_RDONLY, 0755)
 	if err != nil {
 		return nil, err
 	}
 	defer f.Close()
 	scanner := bufio.NewScanner(f)
 	for scanner.Scan() {
-		lines = append(lines, strings.TrimSpace(scanner.Text()))
+		line := strings.TrimSpace(scanner.Text())
+		if line != "" {
+			lines = append(lines, line)
+		}
 	}
 	if scanner.Err() != nil {
 		return nil, scanner.Err()
@@ -332,8 +346,12 @@ func downloadTrack(trackPath, url string) error {
 	if do.StatusCode != http.StatusOK && do.StatusCode != http.StatusPartialContent {
 		return errors.New(do.Status)
 	}
-	totalBytes := uint64(do.ContentLength)
-	counter := &WriteCounter{Total: totalBytes, TotalStr: humanize.Bytes(totalBytes)}
+	totalBytes := do.ContentLength
+	counter := &WriteCounter{
+		Total:     totalBytes,
+		TotalStr:  humanize.Bytes(uint64(totalBytes)),
+		StartTime: time.Now().UnixMilli(),
+	}
 	_, err = io.Copy(f, io.TeeReader(do.Body, counter))
 	fmt.Println("")
 	return err
