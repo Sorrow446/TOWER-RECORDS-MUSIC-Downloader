@@ -13,14 +13,15 @@ type WriteCounter struct {
 }
 
 type Config struct {
-	Email         string
-	Password      string
-	Urls          []string
-	Format        int
-	FormatStr     string
-	OutPath       string
-	TrackTemplate string
-	Lyrics        bool
+	Email            string
+	Password         string
+	Urls             []string
+	Format           int
+	FormatStr        string
+	OutPath          string
+	TrackTemplate    string
+	Lyrics           bool
+	RecochokuAccount bool
 }
 
 type Args struct {

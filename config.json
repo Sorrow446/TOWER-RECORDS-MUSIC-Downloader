@@ -4,5 +4,6 @@
     "format": 2,
     "outPath": "TOWER RECORDS MUSIC downloads",
     "trackTemplate": "{{.trackPad}}. {{.title}}",
-    "lyrics": true
+    "lyrics": true,
+    "recochokuAccount": false
 }

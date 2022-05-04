@@ -70,7 +70,7 @@ func (wc *WriteCounter) Write(p []byte) (int, error) {
 }
 
 func handleErr(errText string, err error, _panic bool) {
-	errString := fmt.Sprintf("%s\n%s", errText, err)
+	errString := errText + "\n" + err.Error()
 	if _panic {
 		panic(errString)
 	}
@@ -236,8 +236,13 @@ func sanitize(filename string) string {
 	return sanitized
 }
 
-func auth(email, pwd string) error {
-	_url := urlBase + "login/tower"
+func auth(email, pwd string, recochokuAcc bool) error {
+	_url := urlBase + "login/"
+	if recochokuAcc {
+		_url += "recochoku"
+	} else {
+		_url += "tower"
+	}
 	data := url.Values{}
 	data.Set("username", email)
 	data.Set("password", pwd)
@@ -256,7 +261,8 @@ func auth(email, pwd string) error {
 		return errors.New(do.Status)
 	}
 	if !strings.HasPrefix(do.Request.URL.String(), urlBase+"login/success") {
-		return errors.New("Bad credentials?")
+		return errors.New(
+			"Bad credentials? Enable recochokuAccount if you have a Recochoku account.")
 	}
 	return nil
 }
@@ -470,7 +476,7 @@ func main() {
 	if err != nil {
 		handleErr("Failed to make output folder.", err, true)
 	}
-	err = auth(cfg.Email, cfg.Password)
+	err = auth(cfg.Email, cfg.Password, cfg.RecochokuAccount)
 	if err != nil {
 		handleErr("Failed to auth.", err, true)
 	}
