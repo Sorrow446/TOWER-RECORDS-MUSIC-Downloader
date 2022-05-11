@@ -311,7 +311,7 @@ func getTrackStreamUrl(_url, formatStr string) (string, string, error) {
 	var retQual string
 	_retQual, ok := queries["quality"]
 	if !ok {
-		retQual = "AAC, unknown birate"
+		retQual = "AAC, unknown bitrate"
 	} else {
 		if _retQual[0] != formatStr {
 			fmt.Println("Track unavailable in your chosen quality.")
