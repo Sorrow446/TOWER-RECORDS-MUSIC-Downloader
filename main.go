@@ -308,9 +308,15 @@ func getTrackStreamUrl(_url, formatStr string) (string, string, error) {
 	if strings.Contains(streamUrl, "/trial-music/") {
 		return "", "", errors.New("The API returned a trial track stream. Expired subscription?")
 	}
-	retQual := queries["quality"][0]
-	if retQual != formatStr {
-		fmt.Println("Track unavailable in your chosen quality.")
+	var retQual string
+	_retQual, ok := queries["quality"]
+	if !ok {
+		retQual = "AAC, unknown birate"
+	} else {
+		if _retQual[0] != formatStr {
+			fmt.Println("Track unavailable in your chosen quality.")
+		}
+		retQual = "AAC " + _retQual[0]
 	}
 	return streamUrl, retQual, nil
 }
@@ -531,7 +537,7 @@ func main() {
 					continue
 				}
 				fmt.Printf(
-					"Downloading track %d of %d: %s - AAC %s\n",
+					"Downloading track %d of %d: %s - %s\n",
 					trackNum, trackTotal, parsedMeta["title"], retQual,
 				)
 				err = downloadTrack(trackPath, streamUrl)
