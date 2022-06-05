@@ -7,6 +7,7 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
+	"html"
 	"html/template"
 	"io"
 	"io/ioutil"
@@ -388,7 +389,7 @@ func parseTemplate(templateText string, tags map[string]string) string {
 		templateText = "{{.trackPad}}. {{.title}}"
 		buffer.Reset()
 	}
-	return buffer.String()
+	return html.UnescapeString(buffer.String())
 }
 
 // Tracks come with metadata and covers, but no track total or year.
